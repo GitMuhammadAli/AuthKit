@@ -1,0 +1,29 @@
+<section class="sign-in">
+  <div class="container">
+    <div class="signin-content">
+      <div class="signin-image">
+        <figure><img src="/images/otp.jpg" alt="sing up image"></figure>
+        <a href="/forget" class="signup-image-link">Forget</a>
+      </div>
+
+      <div class="signin-form">
+        <h2 class="form-title">
+          <%= locals.title %>
+        </h2>
+        <form method="POST" class="register-form" id="login-form">
+          <div class="form-group">
+            <label for="otp"><i class="zmdi zmdi-code"></i></label>
+            <input type="text" name="otp" id="Otp" placeholder="Enter Otp" />
+          </div>
+
+
+
+          <div class="form-group form-button">
+            <input type="submit" name="otp" id="otp" class="form-submit" value="submit" />
+          </div>
+        </form>
+
+      </div>
+    </div>
+  </div>
+</section>
