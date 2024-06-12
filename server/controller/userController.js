@@ -10,7 +10,7 @@ exports.signin = async (req, res) => {
     discription: "Sign In",
     message: { success: info, error: error },
   };
-  res.render("users/signin", { locals, layout: "layouts/login" });
+  res.render("users/signin", { locals, layout: "layouts/main" });
 };
 
 exports.signup = async (req, res) => {
@@ -21,7 +21,7 @@ exports.signup = async (req, res) => {
     discription: "Sign Up",
     message: { success: info, error: error },
   };
-  res.render("users/signup", { locals, layout: "layouts/login" });
+  res.render("users/signup", { locals, layout: "layouts/main" });
 };
 
 exports.reset = async (req, res) => {
@@ -32,7 +32,7 @@ exports.reset = async (req, res) => {
     discription: "Reset Password",
     message: { success: info, error: error },
   };
-  res.render("users/reset", { locals, layout: "layouts/login" });
+  res.render("users/reset", { locals, layout: "layouts/main" });
 };
 
 exports.otp = async (req, res) => {
@@ -43,7 +43,7 @@ exports.otp = async (req, res) => {
     discription: "Otp",
     message: { success: info, error: error },
   };
-  res.render("users/otp", { locals, layout: "layouts/login" });
+  res.render("users/otp", { locals, layout: "layouts/main" });
 };
 exports.forget = async (req, res) => {
   const info = req.flash("success");
@@ -53,5 +53,5 @@ exports.forget = async (req, res) => {
     discription: "Forget Password",
     message: { success: info, error: error },
   };
-  res.render("users/forget", { locals, layout: "layouts/login" });
+  res.render("users/forget", { locals, layout: "layouts/main" });
 };
