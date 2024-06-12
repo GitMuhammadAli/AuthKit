@@ -6,6 +6,7 @@ const flash = require("connect-flash");
 const session = require("express-session");
 const cookieParser = require("cookie-parser");
 const passport = require("passport");
+const dotenv = require("dotenv");
 
 const userRoutes = require("./server/routes/userRoutes");
 const Dbconnection = require('./server/config/db')
@@ -20,7 +21,7 @@ const app = express();
 const port = 8080;
 
 app.use(express.json());
-
+app.use(express.urlencoded({ extended: true }));
 // Static files
 app.use(express.static("public"));
 

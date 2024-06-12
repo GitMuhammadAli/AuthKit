@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const authController = require("../controller/userController");
-const userController = require("../controller/user")
+const authController = require("../controller/userRendering");
+const userController = require("../controller/userController");
 const passport = require("passport");
 
 // Rendering routes
@@ -17,14 +17,22 @@ router.post("/login", userController.login);
 router.post("/forget-password", userController.CheckMailforForget);
 router.post("/verify-otp", userController.ConfirmOtp);
 router.post("/reset-password", userController.CreateNewPassword);
-router.get("/account", userController.UserAccount)
+router.get("/account", userController.UserAccount);
 
-// Google authentication routes
-// router.get('/auth/google', authController.googleAuth);
-// router.get('/auth/google/callback', authController.googleAuthCallback, authController.googleAuthSuccess);
+// // Google authentication routes
+// router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+// router.get('/auth/google/callback',
+//     passport.authenticate('google', { failureRedirect: '/signin' }),
+//     (req, res) => {
+//         res.redirect('/');
+//     });
 
-// Facebook authentication routes
-// router.get('/auth/facebook', authController.facebookAuth);
-// router.get('/auth/facebook/callback', authController.facebookAuthCallback, authController.facebookAuthSuccess);
+// // Facebook authentication routes
+// router.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+// router.get('/auth/facebook/callback',
+//     passport.authenticate('facebook', { failureRedirect: '/signin' }),
+//     (req, res) => {
+//         res.redirect('/');
+//     });
 
 module.exports = router;
