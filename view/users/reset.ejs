@@ -3,14 +3,14 @@
     <div class="signin-content">
       <div class="signin-image">
         <figure><img src="/images/reset.jpg" alt="sing up image"></figure>
-        <a href="/signin" class="signup-image-link">Sign In</a>
+        <a href="/auth/signin" class="signup-image-link">Sign In</a>
       </div>
 
       <div class="signin-form">
         <h2 class="form-title">
           <%= locals.title %>
         </h2>
-        <form method="POST" class="register-form" id="login-form">
+        <form method="POST" class="register-form" id="login-form " action="/auth/register">
           <div class="form-group">
             <label for="password"><i class="zmdi zmdi-lock"></i></label>
             <input type="password" name="Password" id="your_name" placeholder="Enter Password" />

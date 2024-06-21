@@ -8,7 +8,7 @@
                             <h2 class="text-uppercase text-center mb-5">User Account Details</h2>
 
                             <% if (locals.user) { %>
-                                <form action="/user/edit" method="post">
+                                <form action="/auth/user/edit" method="post">
                                     <div class="form-outline mb-4">
                                         <input type="text" id="form3Example1cg" class="form-control form-control-lg"
                                             name="name" value="<%= locals.user.name %>" />
@@ -21,12 +21,12 @@
                                     </div>
                                     <button type="submit" class="btn btn-primary btn-block mb-4">Update</button>
                                 </form>
-                                <form action="/user/delete" method="post">
+                                <form action="/auth/user/delete" method="post">
                                     <button type="submit" class="btn btn-danger btn-block mb-4">Delete
                                         Account</button>
                                 </form>
                                 <% } else { %>
-                                    <!-- User Not Found -->
+
                                     <div class="alert alert-danger" role="alert">
                                         User not found.
                                     </div>
