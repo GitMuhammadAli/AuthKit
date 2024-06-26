@@ -51,9 +51,8 @@ app.use("/auth", userRoutes);
 
 // Handle 404
 app.get("*", (req, res) => {
-  res.status(404).render("404");
+  res.status(404).render("404", { layout: "layouts/main" });
 });
-
 // Google authentication routes
 app.get(
   "/auth/google",

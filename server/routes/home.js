@@ -1,6 +1,6 @@
 const express = require("express");
 const router = express.Router();
-const { AuthorizeUser, FindUser, decodeUser } = require("../middleware/auth");
+const { AuthorizeUser, FindUser } = require("../middleware/auth");
 const home = require("../controller/home");
 
 router.get("/", AuthorizeUser("user"), home.userHome);

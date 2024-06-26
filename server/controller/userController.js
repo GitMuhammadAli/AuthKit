@@ -128,7 +128,6 @@ exports.login = async (req, res) => {
         { expiresIn: "24h" }
       );
       res.cookie("jwt", token, { httpOnly: true, secure: true });
-      console.log(token + " session is " + user.role);
       if (user.role === "admin") {
         return res.redirect("/admin");
       } else {
@@ -150,7 +149,7 @@ const generateOTP = () => {
     specialChars: false,
   });
   const expirationTime = new Date();
-  expirationTime.setMinutes(expirationTime.getMinutes() + 2);
+  expirationTime.setMinutes(expirationTime.getMinutes() + 10);
   return { SendedOtp, expirationTime };
 };
 
@@ -195,6 +194,7 @@ const generatetoken = async (
 exports.CheckMailforForget = async (req, res) => {
   const { email } = req.body;
 
+  console.log(req.body);
   const Findmail = await Users.findOne({ email });
 
   try {
@@ -251,21 +251,32 @@ const decodingToken = async (token, key) => {
 
 // OTP confirmation
 const verifyOTP = async (userOTP, storedOTP, expirationTime) => {
+  userOTP = userOTP.trim();
+  console.log(
+    `Comparing OTPs - User OTP: ${userOTP}, Stored OTP: ${storedOTP}`
+  );
+  console.log(typeof userOTP);
+  console.log(typeof storedOTP);
   if (userOTP !== storedOTP) {
+    console.log("OTP mismatch");
     return false;
   }
   const currentTime = new Date();
+  console.log(
+    `Current Time: ${currentTime}, Expiration Time: ${expirationTime}`
+  );
   if (currentTime > expirationTime) {
+    console.log("OTP expired");
     return false;
   }
-  console.log("returning true");
+  console.log("OTP verified successfully");
   return true;
 };
 
 exports.ConfirmOtp = async (req, res) => {
   const { otp } = req.body;
   let cookieOtp = req.cookies.resetPasswordOTP;
-
+  console.log(req.body);
   if (!cookieOtp) {
     await req.flash("error", "Incorrect OTP or OTP expired. Please try again.");
     return res.redirect("/auth/forget");
@@ -277,9 +288,9 @@ exports.ConfirmOtp = async (req, res) => {
       process.env.JWT_API_SECRET_KEY
     );
 
-    console.log("decoded token", decodedToken);
+    console.log("Decoded Token:", decodedToken);
     const { SendedOtp, expirationTime } = decodedToken;
-    console.log(SendedOtp, expirationTime);
+    console.log(`SendedOtp: ${SendedOtp}, Expiration Time: ${expirationTime}`);
     if (!SendedOtp) {
       await req.flash("error", "OTP is not found in the cookie");
       return res.redirect("/auth/forget");
@@ -300,7 +311,7 @@ exports.ConfirmOtp = async (req, res) => {
         );
 
         await req.flash("success", "OTP is verified");
-        return res.redirect("/auth/NewPassword");
+        return res.redirect("/auth/reset");
       } else {
         console.log("OTP verification failed or expired");
         await req.flash(
@@ -310,9 +321,13 @@ exports.ConfirmOtp = async (req, res) => {
         res.clearCookie("resetPasswordOTP");
         return res.redirect("/auth/forget");
       }
+    } else {
+      console.log("Email not verified");
+      await req.flash("error", "Email not verified");
+      return res.redirect("/auth/otp");
     }
   } catch (error) {
-    console.log(error);
+    console.log("Error:", error);
     await req.flash("error", "Internal server error");
     return res.redirect("/auth/otp");
   }
@@ -322,7 +337,7 @@ exports.ConfirmOtp = async (req, res) => {
 exports.CreateNewPassword = async (req, res) => {
   try {
     const Cookie = req.cookies.resetPasswordOTP;
-    const { newPassword, confirmPassword } = req.body;
+    const { Password, RepeatPassword } = req.body;
     if (!Cookie) {
       await req.flash("error", "User not found");
       return res.redirect("/auth/forget");
@@ -339,16 +354,16 @@ exports.CreateNewPassword = async (req, res) => {
       await req.flash("error", "Please verify your OTP");
       return res.redirect("/auth/otp");
     }
-    console.log(newPassword);
-    console.log(confirmPassword);
-    if (newPassword !== confirmPassword) {
+    console.log(Password);
+    console.log(RepeatPassword);
+    if (Password !== RepeatPassword) {
       await req.flash("error", "Passwords do not match.");
-      return res.redirect("/auth/NewPassword");
+      return res.redirect("/auth/reset");
     }
 
     const { _id } = decodedToken;
     console.log(_id);
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
+    const hashedPassword = await bcrypt.hash(Password, 10);
     console.log(hashedPassword);
     const user = await Users.findByIdAndUpdate(
       _id,
@@ -370,11 +385,11 @@ exports.CreateNewPassword = async (req, res) => {
     await req.flash("success", "Password updated successfully.");
     res.clearCookie("jwt");
     res.clearCookie("resetPasswordOTP");
-    return res.redirect("/auth/login");
+    return res.redirect("/auth/signin");
   } catch (error) {
     console.log(error);
     await req.flash("error", "Internal server error");
-    return res.redirect("/auth/NewPassword");
+    return res.redirect("/auth/reset");
   }
 };
 

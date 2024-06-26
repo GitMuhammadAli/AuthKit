@@ -4,7 +4,6 @@ const jsonwebtoken = require("jsonwebtoken");
 exports.AuthorizeUser = (RequiredRole) => {
   return async (req, res, next) => {
     const token = req.cookies.jwt;
-    console.log("Cookie is " + token);
     if (!token) {
       return res.redirect("/auth/signin");
     }
@@ -20,15 +19,10 @@ exports.AuthorizeUser = (RequiredRole) => {
         return res.redirect("/auth/signin");
       }
 
-      if (user.role === "admin" || user.role === "user") {
-        if (RequiredRole === "admin" && user.role === "admin") {
-          req.user = user;
-          return next();
-        } else if (RequiredRole === "user") {
-          req.user = user;
-          return next();
-        }
-      } else if (user.role === RequiredRole) {
+      if (
+        user.role === RequiredRole ||
+        (RequiredRole === "user" && user.role === "admin")
+      ) {
         req.user = user;
         return next();
       } else {

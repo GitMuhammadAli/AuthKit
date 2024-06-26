@@ -1,21 +1,22 @@
 <section class="sign-in">
   <div class="container">
+    <% if (local.message.success.length> 0) { %>
+      <div class="alert alert-success" role="alert">
+        <% local.message.success.forEach(function(message) { %>
+          <%= message %><br>
+            <% }); %>
+      </div>
+      <% } %>
+    
+        <% if (local.message.error.length> 0) { %>
+          <div class="alert alert-danger" role="alert">
+            <% local.message.error.forEach(function(message) { %>
+              <%= message %><br>
+                <% }); %>
+          </div>
+          <% } %>
     <div class="signin-content">
-      <% if (local.message.success.length> 0) { %>
-        <div class="alert alert-success" role="alert">
-          <% local.message.success.forEach(function(message) { %>
-            <%= message %><br>
-              <% }); %>
-        </div>
-        <% } %>
-
-          <% if (local.message.error.length> 0) { %>
-            <div class="alert alert-danger" role="alert">
-              <% local.message.error.forEach(function(message) { %>
-                <%= message %><br>
-                  <% }); %>
-            </div>
-            <% } %>
+      
 
               <div class="signin-image">
                 <figure><img src="/images/signin-image.jpg" alt="sign up image"></figure>

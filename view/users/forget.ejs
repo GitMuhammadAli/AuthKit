@@ -1,5 +1,20 @@
 <section class="sign-in">
   <div class="container">
+    <% if (local.message.success.length> 0) { %>
+      <div class="alert alert-success" role="alert">
+        <% local.message.success.forEach(function(message) { %>
+          <%= message %><br>
+            <% }); %>
+      </div>
+      <% } %>
+    
+        <% if (local.message.error.length> 0) { %>
+          <div class="alert alert-danger" role="alert">
+            <% local.message.error.forEach(function(message) { %>
+              <%= message %><br>
+                <% }); %>
+          </div>
+          <% } %>
     <div class="signin-content">
       <div class="signin-image">
         <figure><img src="/images/reset.jpg" alt="sing up image"></figure>
@@ -10,11 +25,11 @@
         <h2 class="form-title">
           <%= locals.title %>
         </h2>
-        <form method="POST" class="register-form" id="login-form" action="/auth/register">
+        <form method="POST" class="register-form" id="login-form" action="/auth/forget-password">
           <div class="form-group">
             <label for="forget"><i class="zmdi zmdi-email"></i></label>
 
-            <input type="email" name="forget" id="forget" placeholder="Enter Email" />
+            <input type="email" name="email" id="forget" placeholder="Enter Email" />
           </div>
 
 
