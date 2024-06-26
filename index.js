@@ -8,9 +8,9 @@ const cookieParser = require("cookie-parser");
 
 const userRoutes = require("./server/routes/userRoutes");
 const home = require("./server/routes/home");
-const Dbconnection = require("./server/config/db");
+const connectDB = require("./server/config/db");
 
-Dbconnection();
+connectDB();
 
 // Passport configuration
 // require('./config/passport');

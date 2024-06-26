@@ -18,6 +18,7 @@ router.post("/forget-password", userController.CheckMailforForget);
 router.post("/verify-otp", userController.ConfirmOtp);
 router.post("/reset-password", userController.CreateNewPassword);
 router.get("/account", userController.UserAccount);
+router.get("/logout", userController.logout);
 
 // // Google authentication routes
 // router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));

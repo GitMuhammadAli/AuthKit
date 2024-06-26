@@ -298,6 +298,12 @@ figure {
   display: block;
   text-align: center; }
 
+.forget-password{
+  font-size: 14px;
+    color: #222;
+    display: block;
+}
+
 .term-service {
   font-size: 13px;
   color: #222; }

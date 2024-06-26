@@ -20,13 +20,21 @@ exports.AuthorizeUser = (RequiredRole) => {
         return res.redirect("/auth/signin");
       }
 
-      if (user.role !== RequiredRole) {
-        console.log("Role is not correct");
-        clearCookies(req, res);
-        return res.redirect("/auth/signin");
+      if (user.role === "admin" || user.role === "user") {
+        if (RequiredRole === "admin" && user.role === "admin") {
+          req.user = user;
+          return next();
+        } else if (RequiredRole === "user") {
+          req.user = user;
+          return next();
+        }
       } else if (user.role === RequiredRole) {
         req.user = user;
         return next();
+      } else {
+        console.log("Role is not correct");
+        clearCookies(req, res);
+        return res.redirect("/auth/signin");
       }
     } catch (error) {
       console.error("JWT verification failed:", error);
@@ -72,28 +80,5 @@ exports.FindUser = async (req, res, next) => {
     console.error("Error verifying OTP:", error);
     req.flash("error", "Internal server error");
     return res.redirect("/auth/forget");
-  }
-};
-
-exports.decodeUser = async (req, res, next) => {
-  const token = req.cookies.jwt;
-  if (!token) {
-    return res.redirect("/auth/signin");
-  }
-  try {
-    const decodedToken = jsonwebtoken.verify(
-      token,
-      process.env.JWT_API_SECRET_KEY
-    );
-    const user = await Users.findById(decodedToken._id);
-    if (!user) {
-      clearCookies(req, res);
-      return res.redirect("/auth/signup");
-    }
-    req.user = user;
-    next();
-  } catch (error) {
-    clearCookies(req, res);
-    return res.redirect("/auth/signin");
   }
 };

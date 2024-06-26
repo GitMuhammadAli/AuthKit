@@ -117,33 +117,29 @@ const GenerateToken = async (user, req, res) => {
 
 // Login
 exports.login = async (req, res) => {
+  const { your_email, your_pass } = req.body;
+  console.log(req.body);
   try {
-    console.log("inside login");
-    const { your_email, your_pass } = req.body;
-    console.log(req.body);
-
     const user = await Users.findOne({ email: your_email });
-    console.log(user);
-
-    if (!user) {
-      await req.flash("error", "User not Found. Please register.");
-      return res.redirect("/auth/signin");
-    }
-
-    const isMatch = await bcrypt.compare(your_pass, user.password);
-    if (isMatch) {
-      const token = await makeToken(user._id, user.role);
-      res.cookie("jwt", token, { httpOnly: true });
-      req.session.user = user.role;
-      console.log(token, "session is " + req.session.user);
-      return res.redirect("/");
+    if (user && (await bcrypt.compare(your_pass, user.password))) {
+      const token = jsonwebtoken.sign(
+        { _id: user._id, role: user.role },
+        process.env.JWT_API_SECRET_KEY,
+        { expiresIn: "24h" }
+      );
+      res.cookie("jwt", token, { httpOnly: true, secure: true });
+      console.log(token + " session is " + user.role);
+      if (user.role === "admin") {
+        return res.redirect("/admin");
+      } else {
+        return res.redirect("/");
+      }
     } else {
-      await req.flash("error", "Password does not match.");
-      return res.redirect("/auth/signin");
+      res.status(401).send("Invalid email or password");
     }
   } catch (error) {
-    console.log(error);
-    return res.status(500).send("Internal Server Error");
+    console.error(error);
+    res.status(500).send("Internal server error");
   }
 };
 
@@ -293,7 +289,7 @@ exports.ConfirmOtp = async (req, res) => {
       if (await verifyOTP(otp, SendedOtp, new Date(expirationTime))) {
         console.log("OTP verified successfully");
 
-        const updatedToken = await generatetoken(
+        await generatetoken(
           SendedOtp,
           expirationTime,
           decodedToken._id,
@@ -389,7 +385,7 @@ exports.logout = async (req, res) => {
     if (err) {
       console.log(err);
     }
-    res.redirect("/auth/login");
+    res.redirect("/auth/signin");
   });
 };
 
