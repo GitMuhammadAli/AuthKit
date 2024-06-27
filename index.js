@@ -35,7 +35,7 @@ app.use(
     cookie: {
       httpOnly: true,
       secure: false, 
-      maxAge: process.env.COOKIE_MAX_AGE, 
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
     },
   })
 );
