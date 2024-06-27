@@ -108,7 +108,7 @@ const GenerateToken = async (user, req, res) => {
   const token = await makeToken(user._id, user.role);
   res.cookie("jwt", token, {
     httpOnly: true,
-    maxAge: 7 * 24 * 60 * 60 * 1000,
+    maxAge: process.env.COOKIE_MAX_AGE,
     sameSite: "strict",
   });
   await req.flash("success", "Logged in successfully.");
@@ -118,16 +118,15 @@ const GenerateToken = async (user, req, res) => {
 // Login
 exports.login = async (req, res) => {
   const { your_email, your_pass } = req.body;
-  console.log(req.body);
   try {
     const user = await Users.findOne({ email: your_email });
-    if (user && (await bcrypt.compare(your_pass, user.password))) {
+    if (user && bcrypt.compare(your_pass, user.password)) {
       const token = jsonwebtoken.sign(
         { _id: user._id, role: user.role },
         process.env.JWT_API_SECRET_KEY,
         { expiresIn: "24h" }
       );
-      res.cookie("jwt", token, { httpOnly: true, secure: true });
+      res.cookie("jwt", token, { httpOnly: true, secure: false, maxAge: 24 * 60 * 60 * 1000 }); // 24 hours
       if (user.role === "admin") {
         return res.redirect("/admin");
       } else {
@@ -183,7 +182,7 @@ const generatetoken = async (
     console.log("send to cookie");
     res.cookie("resetPasswordOTP", tok, {
       sameSite: "strict",
-      maxAge: 300000,
+      maxAge: process.env.COOKIE_MAX_AGE,
       httpOnly: true,
     });
   }
@@ -395,13 +394,16 @@ exports.CreateNewPassword = async (req, res) => {
 
 // Logout
 exports.logout = async (req, res) => {
-  await res.clearCookie("jwt");
-  req.session.destroy((err) => {
-    if (err) {
-      console.log(err);
-    }
-    res.redirect("/auth/signin");
-  });
+  try {
+    await res.clearCookie("jwt");
+    await res.clearCookie("resetPasswordOTP");
+    await req.session.destroy();
+    return res.redirect("/auth/signin");
+  } catch (error) {
+    console.log(error);
+    await req.flash("error", "Internal server error");
+    return res.redirect("/auth/signin");
+  }
 };
 
 // User account

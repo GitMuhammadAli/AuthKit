@@ -12,8 +12,7 @@ const connectDB = require("./server/config/db");
 
 connectDB();
 
-// Passport configuration
-// require('./config/passport');
+require('./server/utils/third-party');
 
 const app = express();
 const port = 8080;
@@ -21,6 +20,8 @@ const port = 8080;
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+
+
 // Static files
 app.use(express.static("public"));
 
@@ -31,6 +32,11 @@ app.use(
     secret: process.env.SESSION_SECRET,
     resave: false,
     saveUninitialized: false,
+    cookie: {
+      httpOnly: true,
+      secure: false, 
+      maxAge: process.env.COOKIE_MAX_AGE, 
+    },
   })
 );
 
@@ -45,6 +51,9 @@ app.set("views", "./view");
 app.set("layout", "layouts/main");
 app.set("layout", "layouts/user");
 
+
+
+
 // Routes
 app.use("/", home);
 app.use("/auth", userRoutes);
@@ -53,31 +62,6 @@ app.use("/auth", userRoutes);
 app.get("*", (req, res) => {
   res.status(404).render("404", { layout: "layouts/main" });
 });
-// Google authentication routes
-app.get(
-  "/auth/google",
-  passport.authenticate("google", { scope: ["profile", "email"] })
-);
-app.get(
-  "/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/auth/signin" }),
-  (req, res) => {
-    res.redirect("/");
-  }
-);
-
-// Facebook authentication routes
-app.get(
-  "/auth/facebook",
-  passport.authenticate("facebook", { scope: ["email"] })
-);
-app.get(
-  "/auth/facebook/callback",
-  passport.authenticate("facebook", { failureRedirect: "/auth/signin" }),
-  (req, res) => {
-    res.redirect("/");
-  }
-);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

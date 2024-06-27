@@ -20,20 +20,32 @@ router.post("/reset-password", userController.CreateNewPassword);
 router.get("/account", userController.UserAccount);
 router.get("/logout", userController.logout);
 
-// // Google authentication routes
-// router.get('/auth/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
-// router.get('/auth/google/callback',
-//     passport.authenticate('google', { failureRedirect: '/signin' }),
-//     (req, res) => {
-//         res.redirect('/');
-//     });
+// Google authentication routes
+router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
+router.get('/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/auth/signin' }),
+    (req, res) => {
+        req.logIn(req.user, (err) => {
+            if (err) {
+                return res.redirect('/auth/signin');
+            }
+            res.redirect('/');
+        });
+    }
+);
 
-// // Facebook authentication routes
-// router.get('/auth/facebook', passport.authenticate('facebook', { scope: ['email'] }));
-// router.get('/auth/facebook/callback',
-//     passport.authenticate('facebook', { failureRedirect: '/signin' }),
-//     (req, res) => {
-//         res.redirect('/');
-//     });
+// Facebook authentication routes
+router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
+router.get('/facebook/callback', 
+    passport.authenticate('facebook', { failureRedirect: '/auth/signin' }),
+    (req, res) => {
+        req.logIn(req.user, (err) => {
+            if (err) {
+                return res.redirect('/auth/signin');
+            }
+            res.redirect('/');
+        });
+    }
+);
 
 module.exports = router;

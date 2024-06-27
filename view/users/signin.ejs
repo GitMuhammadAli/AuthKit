@@ -7,7 +7,7 @@
             <% }); %>
       </div>
       <% } %>
-    
+
         <% if (local.message.error.length> 0) { %>
           <div class="alert alert-danger" role="alert">
             <% local.message.error.forEach(function(message) { %>
@@ -15,9 +15,8 @@
                 <% }); %>
           </div>
           <% } %>
-    <div class="signin-content">
-      
 
+            <div class="signin-content">
               <div class="signin-image">
                 <figure><img src="/images/signin-image.jpg" alt="sign up image"></figure>
                 <a href="/auth/signup" class="signup-image-link">Create an account</a>
@@ -28,11 +27,11 @@
                 <form method="POST" class="register-form" id="login-form" action="/auth/login">
                   <div class="form-group">
                     <label for="your_email"><i class="zmdi zmdi-email"></i></label>
-                    <input type="email" name="your_email" id="your_email" placeholder="Your Email" />
+                    <input type="email" name="your_email" id="your_email" placeholder="Your Email" required />
                   </div>
                   <div class="form-group">
                     <label for="your_pass"><i class="zmdi zmdi-lock"></i></label>
-                    <input type="password" name="your_pass" id="your_pass" placeholder="Password" />
+                    <input type="password" name="your_pass" id="your_pass" placeholder="Password"  required/>
                   </div>
                   <div class="form-group">
                     <a href="/auth/forget" class="forget-password">Forget Password</a>
@@ -41,6 +40,7 @@
                     <input type="submit" name="signin" id="signin" class="form-submit" value="Log in" />
                   </div>
                 </form>
+
                 <div class="social-login">
                   <span class="social-label">Or login with</span>
                   <ul class="socials">
@@ -50,6 +50,6 @@
                   </ul>
                 </div>
               </div>
-    </div>
+            </div>
   </div>
 </section>
