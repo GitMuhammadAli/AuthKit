@@ -53,23 +53,26 @@ exports.UserAccount = async (req, res) => {
 exports.Register = async (req, res) => {
   try {
     const { name, email, pass, re_pass } = req.body;
-    console.log(name, email, pass, re_pass);
+    if (name.length < 5) {
+      await req.flash("error", "Name must be at least 5 characters long.");
+      return res.status(400).redirect("/auth/signup");
+    }
     if (!name || !email || !pass || !re_pass) {
       await req.flash("error", "Please fill all fields and submit again.");
-      return res.redirect("/auth/signup");
+      return res.status(400).redirect("/auth/signup");
     }
     if (!validator.isEmail(email)) {
       await req.flash("error", "Please enter a valid email");
-      return res.redirect("/auth/signup");
+      return res.status(400).redirect("/auth/signup");
     }
     if (pass !== re_pass) {
       await req.flash("error", "Passwords do not match.");
-      return res.redirect("/auth/signup");
+      return res.status(400).redirect("/auth/signup");
     }
     const emailCheck = await Users.findOne({ email });
     if (emailCheck) {
       await req.flash("error", "Email already exists.");
-      return res.redirect("/auth/signup");
+      return res.status(400).redirect("/auth/signup");
     }
     const hashedPassword = await bcrypt.hash(pass, 10);
     const newUser = await Users.create({
@@ -78,19 +81,19 @@ exports.Register = async (req, res) => {
       password: hashedPassword,
       role: "user",
     });
-    console.log(newUser);
     if (newUser) {
       await req.flash("success", "Registered successfully.");
-      const token = GenerateToken(newUser);
+      const token = await GenerateToken(newUser, req, res);
       res.cookie("jwt", token, { httpOnly: true });
       return res.redirect("/auth/signin");
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     await req.flash("error", "An error occurred while registering the user.");
-    return res.redirect("/auth/signup");
+    return res.status(500).redirect("/auth/signup");
   }
 };
+
 
 // Token creation
 const makeToken = async (_id, role) => {
@@ -105,14 +108,19 @@ const makeToken = async (_id, role) => {
 };
 
 const GenerateToken = async (user, req, res) => {
-  const token = await makeToken(user._id, user.role);
-  res.cookie("jwt", token, {
-    httpOnly: true,
-    maxAge: process.env.COOKIE_MAX_AGE,
-    sameSite: "strict",
-  });
-  await req.flash("success", "Logged in successfully.");
-  return token;
+  try {
+    const token = await makeToken(user._id, user.role);
+    res.cookie("jwt", token, {
+      httpOnly: true,
+      maxAge: 24 * 60 * 60 * 1000, 
+      sameSite: "strict",
+    });
+    return token;
+  } catch (error) {
+    console.log(error);
+    await req.flash("error", "An error occurred while generating the token.");
+    return res.redirect("/auth/signin");
+  }
 };
 
 // Login
@@ -120,24 +128,22 @@ exports.login = async (req, res) => {
   const { your_email, your_pass } = req.body;
   try {
     const user = await Users.findOne({ email: your_email });
-    if (user && bcrypt.compare(your_pass, user.password)) {
-      const token = jsonwebtoken.sign(
-        { _id: user._id, role: user.role },
-        process.env.JWT_API_SECRET_KEY,
-        { expiresIn: "24h" }
-      );
-      res.cookie("jwt", token, { httpOnly: true, secure: false, maxAge: 24 * 60 * 60 * 1000 }); // 24 hours
+    if (user &&  bcrypt.compare(your_pass, user.password)) {
+      const token = await GenerateToken(user, req, res);
+      res.cookie("jwt", token, { httpOnly: true, secure: false, maxAge: 24 * 60 * 60 * 1000 }); 
       if (user.role === "admin") {
         return res.redirect("/admin");
       } else {
         return res.redirect("/");
       }
     } else {
-      res.status(401).send("Invalid email or password");
+      await req.flash("error", "Invalid email or password");
+      return res.status(401).redirect("/auth/signin");
     }
   } catch (error) {
     console.error(error);
-    res.status(500).send("Internal server error");
+    await req.flash("error", "Internal server error");
+    return res.status(500).redirect("/auth/signin");
   }
 };
 
@@ -182,7 +188,7 @@ const generatetoken = async (
     console.log("send to cookie");
     res.cookie("resetPasswordOTP", tok, {
       sameSite: "strict",
-      maxAge: process.env.COOKIE_MAX_AGE,
+      maxAge: 24 * 60 * 60 * 1000,
       httpOnly: true,
     });
   }
@@ -219,11 +225,35 @@ exports.CheckMailforForget = async (req, res) => {
 
       console.log("mailTOken", tok);
       const to = email;
-      const subject = "Your Otp For Resetting the Password";
-      const text = `Your Otp is  ${SendedOtp} its Expiration time is 2 minutes`;
-      const html = "<h2> Reset Password </h2>";
-
+      const subject = "Your OTP for Resetting the Password";
+      const text = `Your OTP is ${SendedOtp}. It expires in 2 minutes.`;
+      const html = `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+          <h2 style="color: #333;">Reset Password</h2>
+          <p style="font-size: 16px; color: #333;">
+            Dear User,
+          </p>
+          <p style="font-size: 16px; color: #333;">
+            You have requested to reset your password. Please use the following One-Time Password (OTP) to proceed with resetting your password. This OTP is valid for 2 minutes.
+          </p>
+          <div style="text-align: center; margin: 20px 0;">
+            <span style="font-size: 24px; font-weight: bold; color: #333; background: #f0f0f0; padding: 10px 20px; border-radius: 5px; display: inline-block;">
+              ${SendedOtp}
+            </span>
+          </div>
+          <p style="font-size: 16px; color: #333;">
+            If you did not request a password reset, please ignore this email.
+          </p>
+          <p style="font-size: 16px; color: #333;">
+            Thank you,
+            <br>
+            The Support Team
+          </p>
+        </div>
+      `;
+      
       const emailResult = await sendMail(to, subject, text, html);
+      
 
       if (emailResult.success) {
         await req.flash(

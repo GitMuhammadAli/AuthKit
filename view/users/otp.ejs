@@ -26,22 +26,6 @@
           <%= locals.title %>
         </h2>
 
-        <% if (local.message.success.length> 0) { %>
-          <div class="alert alert-success" role="alert">
-            <% local.message.success.forEach(function(message) { %>
-              <%= message %><br>
-                <% }); %>
-          </div>
-          <% } %>
-
-            <% if (local.message.error.length> 0) { %>
-              <div class="alert alert-danger" role="alert">
-                <% local.message.error.forEach(function(message) { %>
-                  <%= message %><br>
-                    <% }); %>
-              </div>
-              <% } %>
-
                 <form method="POST" class="register-form" id="login-form" action="/auth/verify-otp">
                   <div class="form-group">
                     <label for="otp"><i class="zmdi zmdi-code"></i></label>

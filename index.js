@@ -1,7 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const expressLayout = require("express-ejs-layouts");
-const flash = require("connect-flash");
+const flash = require('connect-flash');
 const session = require("express-session");
 const passport = require("passport");
 const cookieParser = require("cookie-parser");
@@ -59,8 +59,17 @@ app.use("/", home);
 app.use("/auth", userRoutes);
 
 // Handle 404
-app.get("*", (req, res) => {
+app.use((req, res, next) => {
   res.status(404).render("404", { layout: "layouts/main" });
+});
+
+app.use((err, req, res, next) => {
+  res.status(err.status || 500);
+  res.render("error", {
+    layout: "layouts/main",
+    message: err.message,
+    error: err
+  });
 });
 
 app.listen(port, () => {

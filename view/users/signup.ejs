@@ -1,26 +1,26 @@
 <section class="signup">
   <div class="container">
     <div class="signup-content">
-      <% if (local.message.success.length> 0) { %>
-        <div class="alert alert-success" role="alert">
-          <% local.message.success.forEach(function(message) { %>
-            <%= message %><br>
-              <% }); %>
-        </div>
       
-      
-        <% } %>
-          <% if (local.message.error.length> 0) { %>
-            <div class="alert alert-danger" role="alert">
-              <% local.message.error.forEach(function(message) { %>
-                <%= message %><br>
-                  <% }); %>
-            </div>
-      
-      
-            <% } %>
       <div class="signup-form">
+        <% if (local.message.success.length> 0) { %>
+          <div class="alert alert-success" role="alert">
+            <% local.message.success.forEach(function(message) { %>
+              <%= message %><br>
+                <% }); %>
+          </div>
         
+        
+          <% } %>
+            <% if (local.message.error.length> 0) { %>
+              <div class="alert alert-danger" role="alert">
+                <% local.message.error.forEach(function(message) { %>
+                  <%= message %><br>
+                    <% }); %>
+              </div>
+        
+        
+              <% } %>
         <h2 class="form-title">Sign up</h2>
         <form method="POST" class="register-form" id="register-form" action="/auth/register">
           <div class="form-group">
