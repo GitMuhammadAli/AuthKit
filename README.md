@@ -51,6 +51,8 @@ To run this project locally, follow these steps:
 - Bootstrap: CSS framework for responsive design.
 
 
+
+
 ## Usage
 After running the application, you can access the following routes
 
@@ -61,3 +63,8 @@ After running the application, you can access the following routes
 - /: Home page (requires authentication)
 - /admin: Admin page (requires admin role)
    
+
+## Register , Login , Forget , Reset
+https://github.com/GitMuhammadAli/AuthKit/assets/135626772/c999eda9-18c1-4604-8e3f-6ac7b2ab82d0
+
+
