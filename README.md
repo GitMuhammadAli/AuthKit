@@ -68,3 +68,8 @@ After running the application, you can access the following routes
 https://github.com/GitMuhammadAli/AuthKit/assets/135626772/c999eda9-18c1-4604-8e3f-6ac7b2ab82d0
 
 
+## Google-Login
+https://github.com/GitMuhammadAli/AuthKit/assets/135626772/3b24bd98-1cc8-486e-b519-052a89e6a0f9
+
+
+
