@@ -24,15 +24,26 @@ router.get("/logout", userController.logout);
 router.get('/google', passport.authenticate('google', { scope: ['profile', 'email'] }));
 router.get('/google/callback', 
     passport.authenticate('google', { failureRedirect: '/auth/signin' }),
-    (req, res) => {
-        req.logIn(req.user, (err) => {
+    async (req, res) => {
+      try {
+        await new Promise((resolve, reject) => {
+          req.logIn(req.user, (err) => {
             if (err) {
-                return res.redirect('/auth/signin');
+              reject(err);
+            } else {
+              resolve();
             }
-            res.redirect('/');
+          });
         });
+  
+        await userController.GenerateToken(req.user, req, res);
+        res.redirect('/');
+      } catch (error) {
+        console.error(error);
+        res.redirect('/auth/signin');
+      }
     }
-);
+  );
 
 // Facebook authentication routes
 router.get('/facebook', passport.authenticate('facebook', { scope: ['email'] }));
@@ -43,6 +54,7 @@ router.get('/facebook/callback',
             if (err) {
                 return res.redirect('/auth/signin');
             }
+
             res.redirect('/');
         });
     }

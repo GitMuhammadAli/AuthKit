@@ -107,7 +107,7 @@ const makeToken = async (_id, role) => {
   return token;
 };
 
-const GenerateToken = async (user, req, res) => {
+exports.GenerateToken = async (user, req, res) => {
   try {
     const token = await makeToken(user._id, user.role);
     res.cookie("jwt", token, {
